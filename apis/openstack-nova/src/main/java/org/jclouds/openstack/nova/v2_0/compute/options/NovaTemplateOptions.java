@@ -65,6 +65,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
          eTo.autoAssignFloatingIp(shouldAutoAssignFloatingIp());
          if (getFloatingIpPoolNames().isPresent())
             eTo.floatingIpPoolNames(getFloatingIpPoolNames().get());
+         eTo.networkRangeFloatingIpAssociated(getNetworkRangeFloatingIpAssociated());
          if (getSecurityGroupNames().isPresent())
             eTo.securityGroupNames(getSecurityGroupNames().get());
          eTo.generateKeyPair(shouldGenerateKeyPair());
@@ -84,6 +85,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
 
    protected boolean autoAssignFloatingIp = false;
    protected Optional<Set<String>> floatingIpPoolNames = Optional.absent();
+   protected String networkRangeFloatingIpAssociated;
    protected boolean generateKeyPair = false;
    protected String keyPairName;
    protected byte[] userData;
@@ -162,6 +164,14 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    }
 
    /**
+    * @see #getNetworkRangeFloatingIpAssociated()
+    */
+   public NovaTemplateOptions networkRangeFloatingIpAssociated(String networkRangeFloatingIpAssociated) {
+      this.networkRangeFloatingIpAssociated = networkRangeFloatingIpAssociated;
+      return this;
+   }
+
+   /**
     * @see #shouldGenerateKeyPair()
     */
    public NovaTemplateOptions generateKeyPair(boolean enable) {
@@ -229,6 +239,17 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
     */
    public Optional<Set<String>> getFloatingIpPoolNames() {
       return floatingIpPoolNames;
+   }
+
+   /**
+    * The network range to use when a floating ip being associated with.
+    * It is used for distinguish multiple networks a VM instance have. Only one
+    * network can be used for floating ip associated with.
+    *
+    * @return network ip range
+    */
+   public String getNetworkRangeFloatingIpAssociated() {
+      return networkRangeFloatingIpAssociated;
    }
 
    /**
@@ -318,6 +339,13 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
       public NovaTemplateOptions floatingIpPoolNames(Iterable<String> floatingIpPoolNames) {
          NovaTemplateOptions options = new NovaTemplateOptions();
          return NovaTemplateOptions.class.cast(options.floatingIpPoolNames(floatingIpPoolNames));
+      }
+
+      /**
+       * @see #getNetworkRangeFloatingIpAssociated()
+       */
+      public static NovaTemplateOptions networkRangeFloatingIpAssociated(String networkRangeFloatingIpAssociated) {
+         return new NovaTemplateOptions().networkRangeFloatingIpAssociated(networkRangeFloatingIpAssociated);
       }
 
       /**
