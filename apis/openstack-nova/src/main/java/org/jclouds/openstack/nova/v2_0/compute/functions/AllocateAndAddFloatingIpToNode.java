@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 package org.jclouds.openstack.nova.v2_0.compute.functions;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -43,10 +39,15 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
 
 /**
  * A function for adding and allocating an ip to a node
@@ -79,13 +80,32 @@ public class AllocateAndAddFloatingIpToNode implements
       FloatingIPApi floatingIpApi = novaApi.getFloatingIPExtensionForZone(zoneId).get();
       Optional<Set<String>> poolNames = input.get().getNovaTemplateOptions().get().getFloatingIpPoolNames();
 
+      // Kasper: Get the private IP matches the network range to be associated for floating IP association
+      String networkRange = input.get().getNovaTemplateOptions().get().getNetworkRangeFloatingIpAssociated();
+      logger.debug("Network range is " + networkRange);
+      String fixIp = null;
+      if (!Strings.isNullOrEmpty(networkRange)) {
+         for (String privateIp : node.getPrivateAddresses()) {
+            if (privateIp.contains(networkRange)) {
+               fixIp = privateIp;
+               break;
+            }
+         }
+      }
+
       Optional<FloatingIP> ip = allocateFloatingIPForNode(floatingIpApi, poolNames, node.getId());
       if (!ip.isPresent()) {
          throw new InsufficientResourcesException("Failed to allocate a FloatingIP for node(" + node.getId() + ")");
       }
       logger.debug(">> adding floatingIp(%s) to node(%s)", ip.get().getIp(), node.getId());
 
-      floatingIpApi.addToServer(ip.get().getIp(), node.getProviderId());
+      if (Strings.isNullOrEmpty(fixIp)) {
+         logger.debug(">> adding floatingIp(%s) to node(%s)", ip.get().getIp(), node.getId());
+         floatingIpApi.addToServer(ip.get().getIp(), node.getProviderId());
+      } else {
+         logger.debug(">> adding floatingIp(%s) to node(%s) associated with (%s)", ip.get().getIp(), node.getId(), fixIp);
+         floatingIpApi.addToServer(fixIp, ip.get().getIp(), node.getProviderId());
+      }
       input.get().getNodeMetadata().set(NodeMetadataBuilder.fromNodeMetadata(node).publicAddresses(ImmutableSet.of(ip.get().getIp())).build());
       floatingIpCache.invalidate(ZoneAndId.fromSlashEncoded(node.getId()));
       return input.get().getNodeMetadata();
