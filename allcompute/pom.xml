@@ -27,11 +27,12 @@
   </parent>
   <artifactId>jclouds-allcompute</artifactId>
   <name>allcompute</name>
+  <version>1.8.1.kasper</version>
   <dependencies>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>aws-ec2</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.api</groupId>
@@ -41,107 +42,107 @@
     <dependency>
       <groupId>org.apache.jclouds.api</groupId>
       <artifactId>openstack-nova-ec2</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.api</groupId>
       <artifactId>byon</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.api</groupId>
       <artifactId>ec2</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>cloudservers-us</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>cloudservers-uk</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.api</groupId>
       <artifactId>cloudservers</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.api</groupId>
       <artifactId>vcloud</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>gogrid</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.api</groupId>
       <artifactId>elasticstack</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>elastichosts-lon-p</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>elastichosts-sat-p</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>elastichosts-lon-b</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>openhosting-east1</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>serverlove-z1-man</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>skalicloud-sdg-my</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>go2cloud-jhb1</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>softlayer</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.api</groupId>
       <artifactId>cloudstack</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>hpcloud-compute</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>rackspace-cloudservers-us</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>rackspace-cloudservers-uk</artifactId>
-      <version>${project.version}</version>
+      <version>${parent.version}</version>
     </dependency>
   </dependencies>
 </project>
