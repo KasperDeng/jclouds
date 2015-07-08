@@ -97,7 +97,6 @@ public class AllocateAndAddFloatingIpToNode implements
       if (!ip.isPresent()) {
          throw new InsufficientResourcesException("Failed to allocate a FloatingIP for node(" + node.getId() + ")");
       }
-      logger.debug(">> adding floatingIp(%s) to node(%s)", ip.get().getIp(), node.getId());
 
       if (Strings.isNullOrEmpty(fixIp)) {
          logger.debug(">> adding floatingIp(%s) to node(%s)", ip.get().getIp(), node.getId());
