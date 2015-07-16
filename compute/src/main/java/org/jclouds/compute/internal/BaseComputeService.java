@@ -15,25 +15,6 @@
  * limitations under the License.
  */
 package org.jclouds.compute.internal;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Predicates.and;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.base.Throwables.propagate;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Maps.newLinkedHashMap;
-import static com.google.common.collect.Sets.newLinkedHashSet;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
-import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
-import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_TERMINATED;
-import static org.jclouds.compute.predicates.NodePredicates.TERMINATED;
-import static org.jclouds.compute.predicates.NodePredicates.all;
-import static org.jclouds.compute.util.ComputeServiceUtils.formatStatus;
-import static org.jclouds.concurrent.FutureIterables.awaitCompletion;
-import static org.jclouds.concurrent.FutureIterables.transformParallel;
-import static org.jclouds.util.Predicates2.retry;
-
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -103,6 +84,25 @@ import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.Atomics;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Maps.newLinkedHashMap;
+import static com.google.common.collect.Sets.newLinkedHashSet;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_TERMINATED;
+import static org.jclouds.compute.predicates.NodePredicates.TERMINATED;
+import static org.jclouds.compute.predicates.NodePredicates.all;
+import static org.jclouds.compute.util.ComputeServiceUtils.formatStatus;
+import static org.jclouds.concurrent.FutureIterables.awaitCompletion;
+import static org.jclouds.concurrent.FutureIterables.transformParallel;
+import static org.jclouds.util.Predicates2.retry;
 
 @Singleton
 public class BaseComputeService implements ComputeService {
@@ -748,5 +748,38 @@ public class BaseComputeService implements ComputeService {
    @Override
    public Optional<SecurityGroupExtension> getSecurityGroupExtension() {
       return securityGroupExtension;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean renameNode(String id, String newName) {
+      return false;
+   }
+
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Map<String, Integer> getQuotaByTenant(String... args) {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Map<String, Integer> getTotalUsageByTenant(String... args) {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Map<String, Integer> getFlavorByFlavorId(String... args) {
+      return null;
    }
 }

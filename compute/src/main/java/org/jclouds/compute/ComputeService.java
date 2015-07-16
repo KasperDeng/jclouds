@@ -396,4 +396,32 @@ public interface ComputeService {
    @Beta
    Optional<SecurityGroupExtension> getSecurityGroupExtension();
 
+   /**
+    * Rename the node for this provider if it implements it.
+    *
+    * @return a bool indicates success or not.
+    */
+   boolean renameNode(String id, String newName);
+
+   /**
+    * Returns the tenant quota for this provider if it implements it.
+    *
+    * @return a simple map to avoid introduce any type defined for specific provider
+    */
+   Map<String, Integer> getQuotaByTenant(String... args);
+
+   /**
+    * Returns the tenant usage by tenant id for this provider if it implements it.
+    *
+    * @return a simple map to avoid introduce any type defined for specific provider
+    */
+   Map<String, Integer> getTotalUsageByTenant(String... args);
+
+   /**
+    * Returns the flavor by flavor id for this provider if it implements it.
+    *
+    * @return a simple map to avoid introduce any type defined for specific provider
+    */
+   Map<String, Integer> getFlavorByFlavorId(String... args);
+
 }
