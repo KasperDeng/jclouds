@@ -16,14 +16,6 @@
  */
 package org.jclouds.openstack.nova.v2_0;
 
-import static org.jclouds.Constants.PROPERTY_SESSION_INTERVAL;
-import static org.jclouds.openstack.keystone.v2_0.config.KeystoneProperties.CREDENTIAL_TYPE;
-import static org.jclouds.openstack.keystone.v2_0.config.KeystoneProperties.SERVICE_TYPE;
-import static org.jclouds.openstack.nova.v2_0.config.NovaProperties.AUTO_ALLOCATE_FLOATING_IPS;
-import static org.jclouds.openstack.nova.v2_0.config.NovaProperties.AUTO_GENERATE_KEYPAIRS;
-import static org.jclouds.openstack.nova.v2_0.config.NovaProperties.TIMEOUT_SECURITYGROUP_PRESENT;
-import static org.jclouds.reflect.Reflection2.typeToken;
-
 import java.net.URI;
 import java.util.Properties;
 
@@ -40,6 +32,14 @@ import org.jclouds.rest.internal.BaseHttpApiMetadata;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
+
+import static org.jclouds.Constants.PROPERTY_SESSION_INTERVAL;
+import static org.jclouds.openstack.keystone.v2_0.config.KeystoneProperties.CREDENTIAL_TYPE;
+import static org.jclouds.openstack.keystone.v2_0.config.KeystoneProperties.SERVICE_TYPE;
+import static org.jclouds.openstack.nova.v2_0.config.NovaProperties.AUTO_ALLOCATE_FLOATING_IPS;
+import static org.jclouds.openstack.nova.v2_0.config.NovaProperties.AUTO_GENERATE_KEYPAIRS;
+import static org.jclouds.openstack.nova.v2_0.config.NovaProperties.TIMEOUT_SECURITYGROUP_PRESENT;
+import static org.jclouds.reflect.Reflection2.typeToken;
 
 /**
  * Implementation of {@link org.jclouds.apis.ApiMetadata} for Nova 2.0 API
@@ -72,7 +72,10 @@ public class NovaApiMetadata extends BaseHttpApiMetadata<NovaApi>  {
       // Keystone 1.1 expires tokens after 24 hours and allows renewal 1 hour
       // before expiry by default.  We choose a value less than the latter
       // since the former persists between jclouds invocations.
-      properties.setProperty(PROPERTY_SESSION_INTERVAL, 30 * 60 + "");
+
+      // Kasper: Change from 30 min to 5 min to guarantee the image cache has correct data
+      // discard the out-of-date image
+      properties.setProperty(PROPERTY_SESSION_INTERVAL, 5 * 60 + "");
       return properties;
    }
 

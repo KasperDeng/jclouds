@@ -16,20 +16,6 @@
  */
 package org.jclouds.compute.domain.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Predicates.and;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Iterables.size;
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Iterables.tryFind;
-import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.String.format;
-import static org.jclouds.compute.util.ComputeServiceUtils.getCores;
-import static org.jclouds.compute.util.ComputeServiceUtils.getCoresAndSpeed;
-import static org.jclouds.compute.util.ComputeServiceUtils.getSpace;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -72,6 +58,20 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Doubles;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Predicates.and;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.size;
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Iterables.tryFind;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
+import static org.jclouds.compute.util.ComputeServiceUtils.getCores;
+import static org.jclouds.compute.util.ComputeServiceUtils.getCoresAndSpeed;
+import static org.jclouds.compute.util.ComputeServiceUtils.getSpace;
 
 public class TemplateBuilderImpl implements TemplateBuilder {
    @Resource
@@ -323,6 +323,25 @@ public class TemplateBuilderImpl implements TemplateBuilder {
       @Override
       public String toString() {
          return "imageVersion(" + imageVersion + ")";
+      }
+   };
+
+   private final Predicate<Image> imageNameEqualPredicate = new Predicate<Image>() {
+      @Override
+      public boolean apply(Image input) {
+         boolean returnVal = true;
+         if (imageName != null) {
+            if (input.getName() == null)
+               returnVal = false;
+            else
+               returnVal = input.getName().equalsIgnoreCase(imageName);
+         }
+         return returnVal;
+      }
+
+      @Override
+      public String toString() {
+         return "imageName(" + imageName + ")";
       }
    };
 
@@ -844,15 +863,22 @@ public class TemplateBuilderImpl implements TemplateBuilder {
       };
 
       try {
-         Iterable<? extends Image> matchingImages = filter(supportedImages, imagePredicate);
+         Iterable<? extends Image> matchingFullyImages = filter(supportedImages, imageNameEqualPredicate);
          if (logger.isTraceEnabled())
-            logger.trace("<<   matched images(%s)", transform(matchingImages, imageToId));
-         return imageChooser().apply(matchingImages);
-      } catch (NoSuchElementException exception) {
-         throwNoSuchElementExceptionAfterLoggingImageIds(format("no image matched params: %s", toString()),
-                  supportedImages);
-         assert false;
-         return null;
+            logger.trace("<<   matched fully with images(%s)", transform(matchingFullyImages, imageToId));
+         return imageChooser().apply(matchingFullyImages);
+      } catch (NoSuchElementException ex) {
+         try {
+            Iterable<? extends Image> matchingImages = filter(supportedImages, imagePredicate);
+            if (logger.isTraceEnabled())
+               logger.trace("<<   matched images(%s)", transform(matchingImages, imageToId));
+            return imageChooser().apply(matchingImages);
+         } catch (NoSuchElementException exception) {
+            throwNoSuchElementExceptionAfterLoggingImageIds(format("no image matched params: %s", toString()),
+                    supportedImages);
+            assert false;
+            return null;
+         }
       }
    }
    
