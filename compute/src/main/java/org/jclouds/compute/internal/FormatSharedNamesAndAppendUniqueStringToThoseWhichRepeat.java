@@ -16,11 +16,8 @@
  */
 package org.jclouds.compute.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_DELIMITER;
-import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_PREFIX;
-
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +35,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_DELIMITER;
+import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_PREFIX;
 
 /**
  * Get a name using a random mechanism that still ties all nodes in a group
@@ -127,7 +128,9 @@ public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat implements
 
    @Override
    public String uniqueNameForGroup(String group) {
-      return String.format(uniqueFormat, checkGroup(group), suffixSupplier.get());
+      //return String.format(uniqueFormat, checkGroup(group), suffixSupplier.get());
+      String timestamp = new SimpleDateFormat("yyMMdd'T'HHmmss").format(System.currentTimeMillis());
+      return String.format(uniqueFormat, checkGroup(group), timestamp);
    }
 
    @Override
