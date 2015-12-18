@@ -130,7 +130,8 @@ public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat implements
    public String uniqueNameForGroup(String group) {
       //return String.format(uniqueFormat, checkGroup(group), suffixSupplier.get());
       String timestamp = new SimpleDateFormat("yyMMdd'T'HHmmss").format(System.currentTimeMillis());
-      return String.format(uniqueFormat, checkGroup(group), timestamp);
+      String suffix = timestamp + delimiter + suffixSupplier.get();
+      return String.format(uniqueFormat, checkGroup(group), suffix);
    }
 
    @Override

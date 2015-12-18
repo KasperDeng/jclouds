@@ -16,11 +16,7 @@
  */
 package org.jclouds.compute.internal;
 
-import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_DELIMITER;
-import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_PREFIX;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import java.text.SimpleDateFormat;
 
 import org.jclouds.compute.functions.GroupNamingConvention;
 import org.jclouds.predicates.Validator;
@@ -32,6 +28,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+
+import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_DELIMITER;
+import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_PREFIX;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 @Test(testName = "FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeatTest")
 public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeatTest {
@@ -78,7 +80,8 @@ public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeatTest {
       FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat fn = new FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat(
             "jclouds", '_', Suppliers.ofInstance("123"), okValidator);
 
-      assertEquals(fn.uniqueNameForGroup("cluster"), "jclouds_cluster_123");
+      String timestamp = new SimpleDateFormat("yyMMdd'T'HHmmss").format(System.currentTimeMillis());
+      assertEquals(fn.uniqueNameForGroup("cluster"), "jclouds_cluster_" + timestamp + "_123");
       // note accidental treatment of a unique node as a shared one can lead to 
       // incorrect group names, as long as we permit delimiter to be in group name
       assertEquals(fn.groupInSharedNameOrNull("jclouds_cluster_123"), "cluster_123");
@@ -143,7 +146,8 @@ public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeatTest {
          }
       }).getInstance(GroupNamingConvention.Factory.class).create();
 
-      assertEquals(fn.uniqueNameForGroup("cluster"), "jclouds-cluster-foo");
+      String timestamp = new SimpleDateFormat("yyMMdd'T'HHmmss").format(System.currentTimeMillis());
+      assertEquals(fn.uniqueNameForGroup("cluster"), "jclouds-cluster-"+timestamp+"-foo");
       // note accidental treatment of a unique node as a shared one can lead to 
       // incorrect group names, as long as we permit delimiter to be in group name
       assertEquals(fn.groupInSharedNameOrNull("jclouds-cluster-foo"), "cluster-foo");
@@ -168,7 +172,8 @@ public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeatTest {
       FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat fn = new FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat(
             "", '_', Suppliers.ofInstance("123"), okValidator);
 
-      assertEquals(fn.uniqueNameForGroup("cluster"), "cluster_123");
+      String timestamp = new SimpleDateFormat("yyMMdd'T'HHmmss").format(System.currentTimeMillis());
+      assertEquals(fn.uniqueNameForGroup("cluster"), "cluster_"+timestamp+"_123");
       assertEquals(fn.groupInSharedNameOrNull("cluster_123"), "cluster_123");
       assertEquals(fn.groupInUniqueNameOrNull("cluster_123"), "cluster");
       assertTrue(fn.containsGroup("cluster").apply("cluster_123"));

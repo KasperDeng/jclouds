@@ -16,16 +16,6 @@
  */
 package org.jclouds.compute.domain.internal;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -62,6 +52,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 @Test(groups = "unit", singleThreaded = true, testName = "TemplateBuilderImplTest")
 public class TemplateBuilderImplTest {
@@ -1003,7 +1003,7 @@ public class TemplateBuilderImplTest {
 
       Template template = templateBuilder.build();
       assertEquals(template.getHardware().getHypervisor(), "OpenVZ");
-      assertEquals(template.getImage().getId(), "Ubuntu 11.04 64-bit");
+      assertEquals(template.getImage().getId(), "Ubuntu 11.04 x64");
    }
    
 
