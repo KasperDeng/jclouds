@@ -19,7 +19,7 @@ package org.jclouds.compute.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_DELIMITER;
 import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_PREFIX;
-
+import java.text.SimpleDateFormat;
 import java.security.SecureRandom;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
@@ -127,7 +127,10 @@ public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat implements
 
    @Override
    public String uniqueNameForGroup(String group) {
-      return String.format(uniqueFormat, checkGroup(group), suffixSupplier.get());
+      //return String.format(uniqueFormat, checkGroup(group), suffixSupplier.get());
+      String timestamp = new SimpleDateFormat("yyMMdd'T'HHmmss").format(System.currentTimeMillis());
+      String suffix = timestamp + delimiter + suffixSupplier.get();
+      return String.format(uniqueFormat, checkGroup(group), suffix);
    }
 
    @Override

@@ -135,6 +135,25 @@ public interface FloatingIPApi {
    void addToServer(@PayloadParam("address") String address, @PathParam("id") String serverId);
 
    /**
+    * Adds a Floating IP address to a Server
+    *
+    * @param serverId
+    *           the server id
+    * @param address
+    *           the fix IP address to be associated with by floating IP
+    *           the floating IP address to add
+    *
+    *           NOTE: Possibly move this to ServerApi?
+    */
+   @Named("floatingIP:add")
+   @POST
+   @Path("/servers/{id}/action")
+   @Produces(MediaType.APPLICATION_JSON)
+   @Payload("%7B\"addFloatingIp\":%7B\"fixed_address\":\"{fixed_address}\",\"address\":\"{address}\"%7D%7D")
+   void addToServer(@PayloadParam("fixed_address") String fixed_address, @PayloadParam("address") String address,
+           @PathParam("id") String serverId);
+
+   /**
     * Removes a Floating IP address from a Server
     *
     * @param serverId

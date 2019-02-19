@@ -306,6 +306,25 @@ public class TemplateBuilderImpl implements TemplateBuilder {
       }
    };
 
+   private final Predicate<Image> imageNameEqualPredicate = new Predicate<Image>() {
+      @Override
+      public boolean apply(Image input) {
+         boolean returnVal = true;
+         if (imageName != null) {
+            if (input.getName() == null)
+               returnVal = false;
+            else
+               returnVal = input.getName().equalsIgnoreCase(imageName);
+         }
+         return returnVal;
+      }
+
+      @Override
+      public String toString() {
+         return "imageName(" + imageName + ")";
+      }
+   };
+
    private final Predicate<Image> imageNamePredicate = new Predicate<Image>() {
       @Override
       public boolean apply(Image input) {
@@ -819,13 +838,20 @@ public class TemplateBuilderImpl implements TemplateBuilder {
       };
 
       try {
-         Iterable<? extends Image> matchingImages = filter(supportedImages, imagePredicate);
-         if (logger.isTraceEnabled())
-            logger.trace("<<   matched images(%s)", transform(matchingImages, imageToId));
-         return imageChooser().apply(matchingImages);
-      } catch (NoSuchElementException exception) {
-         throw throwNoSuchElementExceptionAfterLoggingImageIds(format("no image matched params: %s", toString()),
-               supportedImages);
+         Iterable<? extends Image> matchingFullyImages =
+             filter(supportedImages, imageNameEqualPredicate);
+         logger.trace("<<   matched images(%s)", transform(matchingFullyImages, imageToId));
+         return imageChooser().apply(matchingFullyImages);
+      } catch (NoSuchElementException ex) {
+         try {
+            Iterable<? extends Image> matchingImages = filter(supportedImages, imagePredicate);
+            if (logger.isTraceEnabled())
+               logger.trace("<<   matched images(%s)", transform(matchingImages, imageToId));
+            return imageChooser().apply(matchingImages);
+         } catch (NoSuchElementException exception) {
+            throw throwNoSuchElementExceptionAfterLoggingImageIds(
+                format("no image matched params: %s", toString()), supportedImages);
+         }
       }
    }
 

@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import javax.inject.Named;
 
+import com.google.common.base.*;
 import com.google.common.collect.Sets;
 import org.jclouds.Context;
 import org.jclouds.compute.domain.NodeMetadata;
@@ -51,11 +52,6 @@ import org.jclouds.rest.ApiContext;
 import org.jclouds.rest.InsufficientResourcesException;
 import org.jclouds.rest.ResourceNotFoundException;
 
-import com.google.common.base.Function;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -101,6 +97,19 @@ public class AllocateAndAddFloatingIpToNode
       String regionId = node.getLocation().getParent().getId();
       Optional<Set<String>> poolNames = input.get().getNovaTemplateOptions().get().getFloatingIpPoolNames();
 
+      // Kasper: Get the private IP which matches the network range to be with by floating IP associated
+      String networkRange = input.get().getNovaTemplateOptions().get().getNetworkRangeFloatingIpAssociated();
+      logger.debug("Network range is configured as %s", networkRange);
+      String fixIp = null;
+      if (!Strings.isNullOrEmpty(networkRange)) {
+         for (String privateIp : node.getPrivateAddresses()) {
+            if (privateIp.contains(networkRange)) {
+               fixIp = privateIp;
+               break;
+            }
+         }
+      }
+
       String availabilityZone = getAvailabilityZoneFromTemplateOptionsOrDefault(input, regionId);
 
       if (isNeutronLinked()) {
@@ -124,6 +133,7 @@ public class AllocateAndAddFloatingIpToNode
                        org.jclouds.openstack.neutron.v2.domain.FloatingIP.UpdateFloatingIP
                                .updateBuilder()
                                .portId(optionalPort.get().getId())
+                               .fixedIpAddress(fixIp)
                                .build());
 
                input.get().getNodeMetadata().set(NodeMetadataBuilder.fromNodeMetadata(node).publicAddresses(ImmutableSet.of(ip.getFloatingIpAddress())).build());
@@ -139,11 +149,18 @@ public class AllocateAndAddFloatingIpToNode
             cleanupResources.apply(node);
             throw new InsufficientResourcesException("Failed to allocate a FloatingIP for node(" + node.getId() + ")");
          }
-         logger.debug(">> adding floatingIp(%s) to node(%s)", ip.get().getIp(), node.getId());
 
-         floatingIpApi.addToServer(ip.get().getIp(), node.getProviderId());
-         input.get().getNodeMetadata().set(NodeMetadataBuilder.fromNodeMetadata(node).publicAddresses(ImmutableSet.of(ip.get().getIp())).build());
-         floatingIpCache.asMap().put(RegionAndId.fromSlashEncoded(node.getId()), ImmutableList.of(FloatingIpForServer.create(RegionAndId.fromSlashEncoded(node.getId()), ip.get().getId(), ip.get().getIp())));
+         String floatingIp = ip.get().getIp();
+
+         if (Strings.isNullOrEmpty(fixIp)) {
+            logger.debug(">> adding floatingIp(%s) to node(%s)", floatingIp, node.getId());
+            floatingIpApi.addToServer(floatingIp, node.getProviderId());
+         } else {
+            logger.debug(">> adding floatingIp(%s) associated with (%s) to node(%s) ", floatingIp, fixIp, node.getId());
+            floatingIpApi.addToServer(fixIp, floatingIp, node.getProviderId());
+         }
+         input.get().getNodeMetadata().set(NodeMetadataBuilder.fromNodeMetadata(node).publicAddresses(ImmutableSet.of(floatingIp)).build());
+         floatingIpCache.asMap().put(RegionAndId.fromSlashEncoded(node.getId()), ImmutableList.of(FloatingIpForServer.create(RegionAndId.fromSlashEncoded(node.getId()), ip.get().getId(), floatingIp)));
       }
       return input.get().getNodeMetadata();
    }

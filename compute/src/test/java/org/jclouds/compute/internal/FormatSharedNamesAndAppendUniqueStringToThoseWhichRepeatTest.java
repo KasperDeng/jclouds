@@ -16,22 +16,21 @@
  */
 package org.jclouds.compute.internal;
 
-import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_DELIMITER;
-import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_PREFIX;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import org.jclouds.compute.functions.GroupNamingConvention;
-import org.jclouds.predicates.Validator;
-import org.testng.annotations.Test;
-
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import org.jclouds.compute.functions.GroupNamingConvention;
+import org.jclouds.predicates.Validator;
+import org.testng.annotations.Test;
+
+import java.text.SimpleDateFormat;
+
+import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_DELIMITER;
+import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_PREFIX;
+import static org.testng.Assert.*;
 
 @Test(testName = "FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeatTest")
 public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeatTest {
@@ -78,7 +77,8 @@ public class FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeatTest {
       FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat fn = new FormatSharedNamesAndAppendUniqueStringToThoseWhichRepeat(
             "jclouds", '_', Suppliers.ofInstance("123"), okValidator);
 
-      assertEquals(fn.uniqueNameForGroup("cluster"), "jclouds_cluster_123");
+      String timestamp = new SimpleDateFormat("yyMMdd'T'HHmmss").format(System.currentTimeMillis());
+      assertEquals(fn.uniqueNameForGroup("cluster"), "jclouds_cluster_" + timestamp + "_123");
       // note accidental treatment of a unique node as a shared one can lead to 
       // incorrect group names, as long as we permit delimiter to be in group name
       assertEquals(fn.groupInSharedNameOrNull("jclouds_cluster_123"), "cluster_123");

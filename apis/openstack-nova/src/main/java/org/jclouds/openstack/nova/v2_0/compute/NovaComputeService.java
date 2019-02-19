@@ -21,6 +21,7 @@ import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_R
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_TERMINATED;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -55,8 +56,15 @@ import org.jclouds.compute.strategy.ResumeNodeStrategy;
 import org.jclouds.compute.strategy.SuspendNodeStrategy;
 import org.jclouds.domain.Credentials;
 import org.jclouds.domain.Location;
-import org.jclouds.openstack.nova.v2_0.compute.functions.CleanupResources;
+import org.jclouds.openstack.nova.v2_0.compute.functions.*;
+import org.jclouds.openstack.nova.v2_0.compute.functions.ext.GetFlavor;
+import org.jclouds.openstack.nova.v2_0.compute.functions.ext.GetQuota;
+import org.jclouds.openstack.nova.v2_0.compute.functions.ext.GetTenantUsage;
+import org.jclouds.openstack.nova.v2_0.compute.functions.ext.RenameNode;
 import org.jclouds.openstack.nova.v2_0.compute.options.NovaTemplateOptions;
+import org.jclouds.openstack.nova.v2_0.domain.Flavor;
+import org.jclouds.openstack.nova.v2_0.domain.Quota;
+import org.jclouds.openstack.nova.v2_0.domain.SimpleTenantUsage;
 import org.jclouds.scriptbuilder.functions.InitAdminAccess;
 
 import com.google.common.base.Optional;
@@ -67,6 +75,10 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 @Singleton
 public class NovaComputeService extends BaseComputeService {
    protected final CleanupResources cleanupResources;
+   protected final GetFlavor getFlavor;
+   protected final GetQuota getQuota;
+   protected final GetTenantUsage getTotalUsageByTenant;
+   protected final RenameNode renameNode;
 
    @Inject
    protected NovaComputeService(ComputeServiceContext context, Map<String, Credentials> credentialStore,
@@ -84,8 +96,9 @@ public class NovaComputeService extends BaseComputeService {
          RunScriptOnNode.Factory runScriptOnNodeFactory, InitAdminAccess initAdminAccess,
          PersistNodeCredentials persistNodeCredentials,
          @Named(Constants.PROPERTY_USER_THREADS) ListeningExecutorService userExecutor,
-         CleanupResources cleanupResources, Optional<ImageExtension> imageExtension,
-         Optional<SecurityGroupExtension> securityGroupExtension,
+         CleanupResources cleanupResources, GetFlavor getFlavor, GetQuota getQuota,
+         GetTenantUsage getTotalUsageByTenant, RenameNode renameNode,
+         Optional<ImageExtension> imageExtension, Optional<SecurityGroupExtension> securityGroupExtension,
          DelegatingImageExtension.Factory delegatingImageExtension) {
       super(context, credentialStore, images, sizes, locations, listNodesStrategy, getImageStrategy,
             getNodeMetadataStrategy, runNodesAndAddToSetStrategy, rebootNodeStrategy, destroyNodeStrategy,
@@ -93,6 +106,10 @@ public class NovaComputeService extends BaseComputeService {
             nodeTerminated, nodeSuspended, initScriptRunnerFactory, initAdminAccess, runScriptOnNodeFactory,
             persistNodeCredentials, userExecutor, imageExtension, securityGroupExtension, delegatingImageExtension);
       this.cleanupResources = checkNotNull(cleanupResources, "cleanupResources");
+      this.getFlavor = checkNotNull(getFlavor, "getFlavor");
+      this.getQuota = checkNotNull(getQuota, "getQuota");
+      this.getTotalUsageByTenant = checkNotNull(getTotalUsageByTenant, "getTotalUsageByTenant");
+      this.renameNode = checkNotNull(renameNode, "renameNode");
 
    }
 
@@ -109,6 +126,34 @@ public class NovaComputeService extends BaseComputeService {
    @Override
    public NovaTemplateOptions templateOptions() {
       return NovaTemplateOptions.class.cast(super.templateOptions());
+   }
+
+   /**
+    * rename the node
+    */
+   public Boolean renameNode(String... args) {
+      return renameNode.apply(Arrays.asList(args));
+   }
+
+   /**
+    * get tenant quota
+    */
+   public Optional<Quota> getQuotaByTenant(String... args) {
+      return getQuota.apply(Arrays.asList(args));
+   }
+
+   /**
+    * get flavor by flavor Id
+    */
+   public Optional<Flavor> getFlavorByFlavorId(String... args) {
+      return getFlavor.apply(Arrays.asList(args));
+   }
+
+   /**
+    * get tenant usage by calling the simple tenant usage API
+    */
+   public Optional<SimpleTenantUsage> getTotalUsageByTenant(String... args) {
+      return getTotalUsageByTenant.apply(Arrays.asList(args));
    }
 
 }
